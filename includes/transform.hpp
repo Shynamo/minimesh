@@ -1,25 +1,36 @@
 #pragma once
 
+#include <cstdlib>
+#include <string>
+#include <vector>
+
 enum TransformType
 {
-  // TODO
+  TRANS_MERGE, TRANS_TRANSLATION
 };
 
 struct Params
 {
+  Params(void) {}
   virtual ~Params(void) = default;
 
-  // TODO
+  TransformType transform;
+  std::string output;
+  bool compute_quality;
 };
 
 struct MergeParams : public Params
 {
   // TODO
+  std::vector<std::string> input;
+  bool merge_nodes;
 };
 
 struct TranslationParams : public Params
 {
   // TODO
+  std::string input;
+  std::vector<double> coords;
 };
 
 class Transform

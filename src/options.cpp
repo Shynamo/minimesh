@@ -8,7 +8,7 @@ OptionsParser::OptionsParser(const std::string& file_name)
   m_data = cpptoml::parse_file(m_file_name);
 }
 
-void OptionsParser::parse(void)
+Params OptionsParser::parse(void)
 {
   auto transform = m_data->get_table("transform");
   auto name = *transform->get_as<std::string>("name");
@@ -33,4 +33,5 @@ void OptionsParser::parse(void)
     bool compute_quality = *quality->get_as<bool>("compute_quality");
   } else {
   }
+  return Params();
 }

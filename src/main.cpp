@@ -27,6 +27,8 @@ int main(int argc, char **argv)
     command = argv[1];
   }
 
+  /*  Retrieving command line arguments
+      Setting up file_name and params */
   if ((argc <= 1) || command == "-h" || command == "--help") {
     print_usage();
     return EXIT_SUCCESS;
@@ -46,14 +48,17 @@ int main(int argc, char **argv)
       return EXIT_FAILURE;
     }
     file_name = argv[2];
-    auto op = new OptionsParser(file_name);
-    /*auto params = */op->parse();
+    OptionsParser *op = new OptionsParser(file_name);
+    struct Params params = op->parse();
     delete op;
   } else {
     std::cerr << "Error: unknown command\n";
     print_usage();
     return EXIT_FAILURE;
   }
+
+  /*  Main process */
+
 
   return EXIT_SUCCESS;
 }
