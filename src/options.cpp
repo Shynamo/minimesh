@@ -1,6 +1,6 @@
-#include <memory>
-
 #include "options.hpp"
+
+#include <memory>
 
 OptionsParser::OptionsParser(const std::string& file_name)
   : m_file_name(file_name)

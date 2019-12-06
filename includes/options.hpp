@@ -1,9 +1,9 @@
 #pragma once
 
-#include <memory>
-
 #include "cpptoml.h"
 #include "transform.hpp"
+
+#include <memory>
 
 class OptionsParser
 {
