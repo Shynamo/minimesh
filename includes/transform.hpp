@@ -21,14 +21,12 @@ struct Params
 
 struct MergeParams : public Params
 {
-  // TODO
   std::vector<std::string> input;
   bool merge_nodes;
 };
 
 struct TranslationParams : public Params
 {
-  // TODO
   std::string input;
   std::vector<double> coords;
 };

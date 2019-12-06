@@ -6,5 +6,5 @@ public:
   Viewer(void) {}
   ~Viewer(void) {}
 
-  // TODO
+  //void view(vtkSmartPointer<mon_type>);
 };

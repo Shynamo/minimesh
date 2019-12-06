@@ -4,8 +4,10 @@
 #include <vector>
 #include <memory>
 #include <tuple>
+//#include <vtk>
 
 #include "options.hpp"
+#include "misc.hpp"
 
 void print_usage()
 {
@@ -34,6 +36,7 @@ int main(int argc, char **argv)
     return EXIT_SUCCESS;
   }
 
+  /*  Viewer Setup */
   if (command == "-v" || command == "--view") {
     if (argc < 3) {
       std::cerr << "Error: missing file\n";
@@ -41,6 +44,13 @@ int main(int argc, char **argv)
       return EXIT_FAILURE;
     }
     file_name = argv[2];
+    if (!has_extension(file_name, "vtu") && !has_extension(file_name, "vtk")){
+      std::cerr << "Error: unsupported format. Please use .vtu or .vtk files.\n";
+      return EXIT_FAILURE;
+    }
+
+
+  /*  Transform Setup */
   } else if (command == "-t" || command == "--transform") {
     if (argc < 3) {
       std::cerr << "Error: missing file\n";
@@ -51,14 +61,17 @@ int main(int argc, char **argv)
     OptionsParser *op = new OptionsParser(file_name);
     struct Params params = op->parse();
     delete op;
+    // TODO: test if input filenamesare supported
+
+
+    //test TRANS_MERGE, TRANS_TRANSLATION
+
+  /*  Error case */
   } else {
     std::cerr << "Error: unknown command\n";
     print_usage();
     return EXIT_FAILURE;
   }
-
-  /*  Main process */
-
 
   return EXIT_SUCCESS;
 }
