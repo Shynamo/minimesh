@@ -33,6 +33,9 @@ struct TranslationParams : public Params
   std::vector<double> coords;
 };
 
+// Invalid Params used for error cases
+static const struct Params ErrorParams = Params();
+
 class Transform
 {
 public:

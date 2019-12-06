@@ -13,25 +13,38 @@ Params OptionsParser::parse(void)
   auto transform = m_data->get_table("transform");
   auto name = *transform->get_as<std::string>("name");
 
+  /* Merge case */
   if (name.compare("merge") == 0) {
-    bool merge_nodes = *transform->get_as<bool>("merge_nodes");
+    struct MergeParams params = MergeParams();
+    params.merge_nodes = *transform->get_as<bool>("merge_nodes");
     
     auto io = m_data->get_table("io");
-    std::vector<std::string> meshes = *io->get_array_of<std::string>("inputs");
-    std::string result_file_name = *io->get_as<std::string>("output");
+    params.input = *io->get_array_of<std::string>("inputs");
+    params.output = *io->get_as<std::string>("output");
 
     auto quality = m_data->get_table("quality");
-    bool compute_quality = *quality->get_as<bool>("compute_quality");
+    params.compute_quality = *quality->get_as<bool>("compute_quality");
+
+    return params;
+
+  /* Transform case */
   } else if (name.compare("translate") == 0) {
-    std::vector<double> coords = *transform->get_array_of<double>("translation");
+    struct TranslationParams params = TranslationParams();
+    params.coords = *transform->get_array_of<double>("translation");
 
     auto io = m_data->get_table("io");
-    std::string mesh = *io->get_as<std::string>("input");
-    std::string result_file_name = *io->get_as<std::string>("output");
+    params.input = *io->get_as<std::string>("input");
+    params.output = *io->get_as<std::string>("output");
 
     auto quality = m_data->get_table("quality");
-    bool compute_quality = *quality->get_as<bool>("compute_quality");
+    params.compute_quality = *quality->get_as<bool>("compute_quality");
+
+    return params;
+
+  /* Error case */
   } else {
+    //TODO: throw error
   }
-  return Params();
+
+  return ErrorParams;
 }
