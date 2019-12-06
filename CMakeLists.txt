@@ -13,8 +13,13 @@ include_directories(
 
 set(EXE_SOURCES
   src/options.cpp
+  src/reader.cpp
+  src/viewer.cpp
+  src/misc.cpp
   # Add other source files here, one by line
 )
+
+add_compile_options(${PROJECT_NAME} -Wall -Wextra)
 
 add_executable(${PROJECT_NAME} src/main.cpp ${EXE_SOURCES})
 
