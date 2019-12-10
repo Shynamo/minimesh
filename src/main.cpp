@@ -53,10 +53,15 @@ int main(int argc, char **argv)
       cerr << "Error: unsupported format. Please use .vtu or .vtk files.\n";
       return EXIT_FAILURE;
     }
-
-
     
+    Reader *reader = new Reader();
+    vtkSmartPointer<vtkDataSet> dataset = reader->read(file_name);
 
+    Viewer *viewer = new Viewer();
+    viewer->view(dataset);
+
+    delete reader;
+    delete viewer;
 
   /*  Transform Setup */
   } else if (command == "-t" || command == "--transform") {
