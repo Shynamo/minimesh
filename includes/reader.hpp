@@ -11,5 +11,5 @@ public:
   Reader(void) {}
   ~Reader(void) {}
 
-  vtkSmartPointer<vtkDataSet> view(std::string input_file);
+  vtkSmartPointer<vtkDataSet> read(std::string input_file);
 };
