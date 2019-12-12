@@ -19,9 +19,13 @@ set(EXE_SOURCES
   # Add other source files here, one by line
 )
 
-add_compile_options(${PROJECT_NAME} -Wall -Wextra)
-
 add_executable(${PROJECT_NAME} src/main.cpp ${EXE_SOURCES})
+
+target_compile_options(
+  ${PROJECT_NAME} 
+  PUBLIC
+    -Wall -Wextra
+)
 
 set(VTK_DIR "${VTK_INSTALL_DIR}/lib/cmake/vtk-8.2")
 find_package(VTK REQUIRED)
