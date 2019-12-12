@@ -47,18 +47,18 @@ int main(int argc, char **argv)
   if (command == "-v" || command == "--view") {
     /* Idiot proof checking */
     if (argc < 3) {
-      cerr << "Error: missing file\n";
+      cerr << "ERROR: missing file\n";
       print_usage();
       return EXIT_FAILURE;
     }
     file_name = argv[2];
     if (!file_exists(file_name)){
-      cerr << "Error: File " << file_name << " doesn't exist.\n";
+      cerr << "ERROR: File " << file_name << " doesn't exist.\n";
       print_usage();
       return EXIT_FAILURE;
     }
     if (!has_extension(file_name, "vtu") && !has_extension(file_name, "vtk")){
-      cerr << "Error: unsupported format. Please use .vtu or .vtk files.\n";
+      cerr << "ERROR: unsupported format. Please use .vtu or .vtk files.\n";
       print_usage();
       return EXIT_FAILURE;
     }
@@ -77,7 +77,7 @@ int main(int argc, char **argv)
   /*  Transform Setup */
   } else if (command == "-t" || command == "--transform") {
     if (argc < 3) {
-      cerr << "Error: missing file.\n";
+      cerr << "ERROR: missing file.\n";
       print_usage();
       return EXIT_FAILURE;
     }
@@ -88,7 +88,7 @@ int main(int argc, char **argv)
 
     /* Error case for parsing */
     if (params == nullptr){
-      cerr << "Error: couldn't parse input file.\n";
+      cerr << "ERROR: couldn't parse input file.\n";
       print_usage();
       return EXIT_FAILURE;
     }
@@ -103,10 +103,11 @@ int main(int argc, char **argv)
       MergeParams *mparams = dynamic_cast<MergeParams*>(params);
       /* Dynamic cast error */
       if (mparams == nullptr){
-        cerr << "Error: Parameters conversion error.\n";
+        cerr << "ERROR: Parameters conversion error.\n";
         return EXIT_FAILURE;
       }
 
+      cout << "TANS MERGE\n";
       //TODO: transform
 
 
@@ -114,15 +115,16 @@ int main(int argc, char **argv)
       TranslationParams *tparams = dynamic_cast<TranslationParams*>(params);
       /* Dynamic cast error */
       if (tparams == nullptr){
-        cerr << "Error: Parameters conversion error.\n";
+        cerr << "ERROR: Parameters conversion error.\n";
         return EXIT_FAILURE;
       }
 
       //TODO: transform
+      cout << "TANS TRANS\n";
 
     /* Error case */
     } else {
-      cerr << "Error: Invalid transformation.\n";
+      cerr << "ERROR: Invalid transformation.\n";
       print_usage();
       return EXIT_FAILURE;
     }
@@ -130,13 +132,13 @@ int main(int argc, char **argv)
     /* Visualizing data */
     vtkSmartPointer<vtkDataSet> transformed_dataset = nullptr; //TODO: Implement transformation
     Viewer *viewer = new Viewer();
-    viewer->view(transformed_dataset);
+    //viewer->view(transformed_dataset);
     delete viewer;
 
   /*  Error case */
   } // End transform
   else {
-    cerr << "Error: unknown command\n";
+    cerr << "ERROR: unknown command\n";
     print_usage();
     return EXIT_FAILURE;
   }
