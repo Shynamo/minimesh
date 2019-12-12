@@ -2,7 +2,6 @@
 
 #include <vtkSmartPointer.h>
 #include <vtkDataSet.h>
-#include <vtkDataSet.h>
 #include <vtkDataSetMapper.h>
 #include <vtkActor.h>
 #include <vtkOpenGLRenderer.h>
