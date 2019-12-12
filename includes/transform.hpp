@@ -3,11 +3,15 @@
 #include <cstdlib>
 #include <string>
 #include <vector>
+#include <vtkSmartPointer.h>
+#include <vtkDataSet.h>
 
 enum TransformType
 {
   TRANS_MERGE, TRANS_TRANSLATION
 };
+
+/* ======= PARAMS ======= */
 
 struct Params
 {
@@ -34,11 +38,44 @@ struct TranslationParams : public Params
 // Invalid Params used for error cases
 static const struct Params ErrorParams = Params();
 
+/* ======= TRANSFORM ======= */
+
 class Transform
 {
 public:
-  Transform(void) {}
-  ~Transform(void) {}
+  Transform(void) : _dataset(nullptr) {}
+  virtual ~Transform(void) {}
 
-  // TODO
+  virtual vtkSmartPointer<vtkDataSet> start(void) = 0;
+  void setParams(Params *params);
+  bool saveOutput(void); /// Return true if success, false if failure
+
+private: 
+  Params *_params; /// Transformation parameters
+  vtkSmartPointer<vtkDataSet> _dataset; /// Transformed dataset
+};
+
+
+class MergeTransform : public Transform
+{
+public:
+  MergeTransform(Params *params);
+  virtual ~MergeTransform(void) {}
+
+  virtual vtkSmartPointer<vtkDataSet> start(void);
+
+private: 
+  MergeParams *_params;
+};
+
+class TranslationTransform : public Transform
+{
+public:
+  TranslationTransform(Params *params);
+  virtual ~TranslationTransform(void) {}
+
+  virtual vtkSmartPointer<vtkDataSet> start(void);
+
+private: 
+  TranslationParams *_params;
 };
