@@ -2,8 +2,8 @@
 
 #include <vtkSmartPointer.h>
 #include <vtkDataSet.h>
-#include <vtkPolyData.h>
-#include <vtkPolyDataMapper.h>
+#include <vtkDataSet.h>
+#include <vtkDataSetMapper.h>
 #include <vtkActor.h>
 #include <vtkOpenGLRenderer.h>
 #include <vtkRenderWindow.h>
@@ -12,19 +12,15 @@
 
 void Viewer::view(vtkSmartPointer<vtkDataSet> dataset){
   // Mapper
-  vtkSmartPointer<vtkPolyData> polyData
-   = vtkSmartPointer<vtkPolyData>(vtkPolyData::SafeDownCast(dataset));
-  vtkSmartPointer<vtkPolyDataMapper> mapper
-   = vtkSmartPointer<vtkPolyDataMapper>::New();
-  mapper->SetInputData(polyData);
+  vtkSmartPointer<vtkDataSetMapper> mapper = vtkSmartPointer<vtkDataSetMapper>::New();
+  mapper->SetInputData(dataset);
   mapper->ScalarVisibilityOff();
 
   // Actor
   vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
   actor->SetMapper(mapper);
-  actor->GetProperty()->SetSpecular(.3);
-  actor->GetProperty()->SetSpecularPower(30);
   actor->GetProperty()->EdgeVisibilityOn();
+  actor->GetProperty()->VertexVisibilityOn();
 
   // Renderer
   vtkSmartPointer<vtkRenderer> renderer = vtkSmartPointer<vtkRenderer>::New();
