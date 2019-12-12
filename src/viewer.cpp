@@ -13,7 +13,6 @@ void Viewer::view(vtkSmartPointer<vtkDataSet> dataset){
   // Mapper
   vtkSmartPointer<vtkDataSetMapper> mapper = vtkSmartPointer<vtkDataSetMapper>::New();
   mapper->SetInputData(dataset);
-  mapper->ScalarVisibilityOff();
 
   // Actor
   vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
