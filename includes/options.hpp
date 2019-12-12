@@ -11,7 +11,7 @@ public:
   OptionsParser(const std::string&);
   ~OptionsParser(void) {}
 
-  struct Params parse();
+  struct Params *parse();
 
 private:
   std::string m_file_name;
