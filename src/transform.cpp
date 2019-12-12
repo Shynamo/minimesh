@@ -12,6 +12,7 @@
 #include <vtkUnstructuredGrid.h>
 #include <vtkGeneralTransform.h>
 #include <vtkTransformFilter.h>
+#include <vtkMeshQuality.h>
 
 using namespace std;
 
@@ -25,6 +26,23 @@ TranslationTransform::TranslationTransform(struct Params *params):Transform(){
 
 void Transform::setParams(struct Params *params){
   this->_params = params;
+}
+
+void Transform::computeQuality(void){
+  /* Il aurait mieux valu mettre cette methode dans une autre classe
+    et ne l'appeller que si besoin dans cette classe. Cela permettrait
+    d'appliquer le contrôle de qualité même sur des DataSets n'ayant rien à voir
+    avec une transformation.
+    Mais il se fait tard, donc j'ai choisi la solution de facilité en la mettant ici.
+  */
+
+  vtkSmartPointer<vtkMeshQuality> qualityFilter =
+    vtkSmartPointer<vtkMeshQuality>::New();
+  qualityFilter->SetInputData(this->_dataset);
+  qualityFilter->SetTriangleQualityMeasureToShapeAndSize();
+  qualityFilter->Update();
+  
+  this->_dataset->ShallowCopy(qualityFilter->GetOutput());
 }
 
 bool Transform::saveOutput(){
@@ -67,12 +85,17 @@ MergeTransform::start(){
   delete[] datasets;
 
   this->_dataset = vtkSmartPointer<vtkDataSet>(vtkUnstructuredGrid::SafeDownCast(filter->GetOutput()));
+  if (this->_params->compute_quality){
+    this->computeQuality();
+  }
+
   return this->_dataset;
 }
 
 /* Translation Transform */
 vtkSmartPointer<vtkDataSet> 
 TranslationTransform::start(){
+  cerr << this->_params << endl;
   if (this->_params == nullptr){ return nullptr; }
   vtkSmartPointer<vtkXMLUnstructuredGridReader> reader
    = vtkSmartPointer<vtkXMLUnstructuredGridReader>::New();
@@ -92,6 +115,11 @@ TranslationTransform::start(){
   transfoFilter->Update();
 
   this->_dataset = vtkSmartPointer<vtkDataSet>(vtkDataSet::SafeDownCast(transfoFilter->GetOutput()));
+
+  if (this->_params->compute_quality){
+    this->computeQuality();
+  }
+
   return this->_dataset;
 }
 

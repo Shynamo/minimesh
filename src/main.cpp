@@ -1,6 +1,5 @@
 #include "options.hpp"
 #include "misc.hpp"
-#include "quality.hpp"
 #include "viewer.hpp"
 #include "reader.hpp"
 #include "transform.hpp"

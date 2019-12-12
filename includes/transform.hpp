@@ -50,6 +50,7 @@ public:
   void setParams(Params *params);
   bool saveOutput(void); /// Return true if success, false if failure
   bool getOutput(void);
+  void computeQuality(void);
 
 protected: 
   Params *_params; /// Transformation parameters
