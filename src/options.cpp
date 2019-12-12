@@ -29,6 +29,7 @@ Params *OptionsParser::parse(void)
 
   /* Transform case */
   } else if (name.compare("translate") == 0) {
+    //FIXME: Seems like TranslationParams doesn't parse very well
     struct TranslationParams *params = new TranslationParams();
     params->coords = *transform->get_array_of<double>("translation");
 
