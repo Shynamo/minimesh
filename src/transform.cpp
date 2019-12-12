@@ -6,9 +6,12 @@
 #include <vtkSmartPointer.h>
 #include <vtkDataSet.h>
 #include <vtkAppendPolyData.h>
-//#include <vtkCleanGrid.h>
-#include <vtkUnstructuredGridBaseAlgorithm.h>
 #include <vtkXMLUnstructuredGridWriter.h>
+#include <vtkAppendFilter.h>
+#include <vtkXMLUnstructuredGridReader.h>
+#include <vtkUnstructuredGrid.h>
+#include <vtkGeneralTransform.h>
+#include <vtkTransformFilter.h>
 
 using namespace std;
 
@@ -30,6 +33,7 @@ bool Transform::saveOutput(){
   vtkSmartPointer<vtkXMLUnstructuredGridWriter> writer
     = vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
   writer->SetFileName(this->_params->output.c_str());
+  writer->SetInputData(this->_dataset);
 
   return writer->Write() == 1 ? true : false;
 }
@@ -41,25 +45,28 @@ bool Transform::getOutput(){
 /* Merge Transform */
 vtkSmartPointer<vtkDataSet> 
 MergeTransform::start(){
-  if (this->_params){ return nullptr; }
-  //FIXME
+  if (this->_params == nullptr){ return nullptr; }
+
   /* Adding every input to the filter */
-  vtkSmartPointer<vtkUnstructuredGridBaseAlgorithm> gridAlgorithm
-    = vtkSmartPointer<vtkUnstructuredGridBaseAlgorithm>::New();
-  //vtkSmartPointer<vtkCleanGrid> cleanFilter;
-  Reader *reader = new Reader();
+  auto datasets = new vtkSmartPointer<vtkXMLUnstructuredGridReader>[this->_params->input.size()];
+  vtkSmartPointer<vtkAppendFilter> filter
+   = vtkSmartPointer<vtkAppendFilter>::New();
+
+  filter->SetMergePoints(this->_params->merge_nodes);
+
+  int i = 0;
   for (auto &input: this->_params->input){
-    gridAlgorithm->AddInputData(reader->read(input));
+    datasets[i] = vtkSmartPointer<vtkXMLUnstructuredGridReader>::New();
+    datasets[i]->SetFileName(input.c_str());
+    datasets[i]->Update();
+    filter->AddInputConnection(datasets[i]->GetOutputPort());
+    filter->Update();
+    i++;
   }
-  
-  /* Remove any duplicate points */
-  /* cleanFilter = vtkSmartPointer<vtkCleanGrid>::New();
-  cleanFilter->SetInputConnection(gridAlgorithm->GetOutputPort());
-  cleanFilter->Update();
-  this->_dataset = vtkSmartPointer<vtkDataSet>(cleanFilter->GetOutputPort()); */
 
-  delete reader;
+  delete[] datasets;
 
+  this->_dataset = vtkSmartPointer<vtkDataSet>(vtkUnstructuredGrid::SafeDownCast(filter->GetOutput()));
   return this->_dataset;
 }
 
@@ -67,13 +74,24 @@ MergeTransform::start(){
 vtkSmartPointer<vtkDataSet> 
 TranslationTransform::start(){
   if (this->_params){ return nullptr; }
+  vtkSmartPointer<vtkXMLUnstructuredGridReader> reader
+   = vtkSmartPointer<vtkXMLUnstructuredGridReader>::New();
+  reader->SetFileName(this->_params->input.c_str());
+  reader->Update();
 
-  Reader *reader = new Reader();
-  this->_dataset = reader->read(this->_params->input);  
-  delete reader;
+  vtkSmartPointer<vtkGeneralTransform> transfo
+    = vtkSmartPointer<vtkGeneralTransform>::New();
+  transfo->Translate(this->_params->coords[0], 
+                     this->_params->coords[1], 
+                     this->_params->coords[2]);
+  
+  vtkSmartPointer<vtkTransformFilter> transfoFilter
+    = vtkSmartPointer<vtkTransformFilter>::New();
+  transfoFilter->SetInputConnection(reader->GetOutputPort());
+  transfoFilter->SetTransform(transfo);
+  transfoFilter->Update();
 
-  //TODO
-
+  this->_dataset = vtkSmartPointer<vtkDataSet>(vtkDataSet::SafeDownCast(transfoFilter->GetOutput()));
   return this->_dataset;
 }
 

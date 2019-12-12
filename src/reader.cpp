@@ -7,7 +7,6 @@
 #include <vtkDataSet.h>
 #include <vtkXMLUnstructuredGridReader.h>
 #include <vtkUnstructuredGrid.h>
-#include <vtkPolyDataMapper.h>
 
 vtkSmartPointer<vtkDataSet> Reader::read(std::string input_file){
   // Read data from file
