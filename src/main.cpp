@@ -93,34 +93,14 @@ int main(int argc, char **argv)
       return EXIT_FAILURE;
     }
 
-    /* Reading Input File */
-    Reader *reader = new Reader();
-    vtkSmartPointer<vtkDataSet> dataset = reader->read(file_name);
-    delete reader;
-
-    /* Applying Transformation */
+    //TODO: Factoriser une fois que ça fonctionne
+    /* Initializing transformer */
+    Transform *transformer;
     if (params->transform == TRANS_MERGE){
-      MergeParams *mparams = dynamic_cast<MergeParams*>(params);
-      /* Dynamic cast error */
-      if (mparams == nullptr){
-        cerr << "ERROR: Parameters conversion error.\n";
-        return EXIT_FAILURE;
-      }
-
-      cout << "TANS MERGE\n";
-      //TODO: transform
-
+      transformer = new MergeTransform(params);
 
     } else if (params->transform == TRANS_TRANSLATION){
-      TranslationParams *tparams = dynamic_cast<TranslationParams*>(params);
-      /* Dynamic cast error */
-      if (tparams == nullptr){
-        cerr << "ERROR: Parameters conversion error.\n";
-        return EXIT_FAILURE;
-      }
-
-      //TODO: transform
-      cout << "TANS TRANS\n";
+      transformer = new TranslationTransform(params);
 
     /* Error case */
     } else {
@@ -130,10 +110,22 @@ int main(int argc, char **argv)
     }
 
     /* Visualizing data */
-    vtkSmartPointer<vtkDataSet> transformed_dataset = nullptr; //TODO: Implement transformation
+    vtkSmartPointer<vtkDataSet> transformed_dataset
+     = transformer->start();
+    if (transformed_dataset == nullptr){
+      cerr << "ERROR: Couldn't transform data.\n";
+      delete params;
+      delete transformer;
+      return EXIT_FAILURE;
+    }
+    if (!transformer->saveOutput()){
+      cerr << "WARNING: Couldn't save output file.\n";
+    }
     Viewer *viewer = new Viewer();
     //viewer->view(transformed_dataset);
+    delete params;
     delete viewer;
+    delete transformer;
 
   /*  Error case */
   } // End transform

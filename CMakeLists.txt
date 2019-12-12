@@ -16,6 +16,7 @@ set(EXE_SOURCES
   src/reader.cpp
   src/viewer.cpp
   src/misc.cpp
+  src/transform.cpp
   # Add other source files here, one by line
 )
 
