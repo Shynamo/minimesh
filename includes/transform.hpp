@@ -49,8 +49,9 @@ public:
   virtual vtkSmartPointer<vtkDataSet> start(void) = 0;
   void setParams(Params *params);
   bool saveOutput(void); /// Return true if success, false if failure
+  bool getOutput(void);
 
-private: 
+protected: 
   Params *_params; /// Transformation parameters
   vtkSmartPointer<vtkDataSet> _dataset; /// Transformed dataset
 };
@@ -64,7 +65,7 @@ public:
 
   virtual vtkSmartPointer<vtkDataSet> start(void);
 
-private: 
+protected: 
   MergeParams *_params;
 };
 
@@ -76,6 +77,6 @@ public:
 
   virtual vtkSmartPointer<vtkDataSet> start(void);
 
-private: 
+protected: 
   TranslationParams *_params;
 };
