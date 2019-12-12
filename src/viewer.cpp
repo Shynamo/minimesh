@@ -8,6 +8,7 @@
 #include <vtkOpenGLRenderer.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
+#include <vtkProperty.h>
 
 void Viewer::view(vtkSmartPointer<vtkDataSet> dataset){
   // Mapper
@@ -16,22 +17,29 @@ void Viewer::view(vtkSmartPointer<vtkDataSet> dataset){
   vtkSmartPointer<vtkPolyDataMapper> mapper
    = vtkSmartPointer<vtkPolyDataMapper>::New();
   mapper->SetInputData(polyData);
+  mapper->ScalarVisibilityOff();
 
   // Actor
   vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
   actor->SetMapper(mapper);
-  actor->GetMapper()->ScalarVisibilityOff();
+  actor->GetProperty()->SetSpecular(.3);
+  actor->GetProperty()->SetSpecularPower(30);
+  actor->GetProperty()->EdgeVisibilityOn();
 
   // Renderer
   vtkSmartPointer<vtkRenderer> renderer = vtkSmartPointer<vtkRenderer>::New();
+  renderer->UseHiddenLineRemovalOn();
+  renderer->AddActor(actor);
+
+  // Render window
   vtkSmartPointer<vtkRenderWindow> renderWindow = vtkSmartPointer<vtkRenderWindow>::New();
+  renderWindow->SetSize(640, 480);
   renderWindow->AddRenderer(renderer);
 
   // Interactor
   vtkSmartPointer<vtkRenderWindowInteractor> renderWindowInteractor
    = vtkSmartPointer<vtkRenderWindowInteractor>::New();
   renderWindowInteractor->SetRenderWindow(renderWindow);
-  renderer->AddActor(actor);
 
   // Launch
   renderWindowInteractor->Initialize();
