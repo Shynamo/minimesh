@@ -73,7 +73,7 @@ MergeTransform::start(){
 /* Translation Transform */
 vtkSmartPointer<vtkDataSet> 
 TranslationTransform::start(){
-  if (this->_params){ return nullptr; }
+  if (this->_params == nullptr){ return nullptr; }
   vtkSmartPointer<vtkXMLUnstructuredGridReader> reader
    = vtkSmartPointer<vtkXMLUnstructuredGridReader>::New();
   reader->SetFileName(this->_params->input.c_str());
