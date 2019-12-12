@@ -18,7 +18,6 @@ vtkSmartPointer<vtkDataSet> Reader::read(std::string input_file){
 
   // Conversion to dataset
   vtkSmartPointer<vtkDataSet> dataset = 
-    vtkSmartPointer<vtkUnstructuredGrid>::New(); 
-  dataset->SafeDownCast(reader->GetOutput());
+    vtkSmartPointer<vtkUnstructuredGrid>(vtkUnstructuredGrid::SafeDownCast(reader->GetOutput()));
   return dataset;
 }

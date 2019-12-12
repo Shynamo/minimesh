@@ -3,6 +3,7 @@
 #include "quality.hpp"
 #include "viewer.hpp"
 #include "reader.hpp"
+#include "transform.hpp"
 
 #include <cstdlib>
 #include <iostream>
@@ -34,54 +35,107 @@ int main(int argc, char **argv)
     command = argv[1];
   }
 
-  /*  Retrieving command line arguments
-      Setting up file_name and params */
+  /* Helper */
   if ((argc <= 1) || command == "-h" || command == "--help") {
     print_usage();
     return EXIT_SUCCESS;
   }
 
+  /* =========== VIEWER =========== */
+
   /*  Viewer Setup */
   if (command == "-v" || command == "--view") {
+    /* Idiot proof checking */
     if (argc < 3) {
       cerr << "Error: missing file\n";
       print_usage();
       return EXIT_FAILURE;
     }
     file_name = argv[2];
+    if (!file_exists(file_name)){
+      cerr << "Error: File " << file_name << " doesn't exist.\n";
+      print_usage();
+      return EXIT_FAILURE;
+    }
     if (!has_extension(file_name, "vtu") && !has_extension(file_name, "vtk")){
       cerr << "Error: unsupported format. Please use .vtu or .vtk files.\n";
+      print_usage();
       return EXIT_FAILURE;
     }
     
+    /* Reading and Viewing data */
     Reader *reader = new Reader();
     vtkSmartPointer<vtkDataSet> dataset = reader->read(file_name);
+    delete reader;
 
     Viewer *viewer = new Viewer();
     viewer->view(dataset);
-
-    delete reader;
     delete viewer;
+
+  /* =========== TRANSFORM =========== */
 
   /*  Transform Setup */
   } else if (command == "-t" || command == "--transform") {
     if (argc < 3) {
-      cerr << "Error: missing file\n";
+      cerr << "Error: missing file.\n";
       print_usage();
       return EXIT_FAILURE;
     }
     file_name = argv[2];
     OptionsParser *op = new OptionsParser(file_name);
-    auto params = op->parse();
+    Params *params = op->parse();
     delete op;
-    //TODO: tester le type de retour cout << typeof(params) << endl;
-    // TODO: test if input filenamesare supported
+
+    /* Error case for parsing */
+    if (params == nullptr){
+      cerr << "Error: couldn't parse input file.\n";
+      print_usage();
+      return EXIT_FAILURE;
+    }
+
+    /* Reading Input File */
+    Reader *reader = new Reader();
+    vtkSmartPointer<vtkDataSet> dataset = reader->read(file_name);
+    delete reader;
+
+    /* Applying Transformation */
+    if (params->transform == TRANS_MERGE){
+      MergeParams *mparams = dynamic_cast<MergeParams*>(params);
+      /* Dynamic cast error */
+      if (mparams == nullptr){
+        cerr << "Error: Parameters conversion error.\n";
+        return EXIT_FAILURE;
+      }
+
+      //TODO: transform
 
 
-    //test TRANS_MERGE, TRANS_TRANSLATION
+    } else if (params->transform == TRANS_TRANSLATION){
+      TranslationParams *tparams = dynamic_cast<TranslationParams*>(params);
+      /* Dynamic cast error */
+      if (tparams == nullptr){
+        cerr << "Error: Parameters conversion error.\n";
+        return EXIT_FAILURE;
+      }
+
+      //TODO: transform
+
+    /* Error case */
+    } else {
+      cerr << "Error: Invalid transformation.\n";
+      print_usage();
+      return EXIT_FAILURE;
+    }
+
+    /* Visualizing data */
+    vtkSmartPointer<vtkDataSet> transformed_dataset = nullptr; //TODO: Implement transformation
+    Viewer *viewer = new Viewer();
+    viewer->view(transformed_dataset);
+    delete viewer;
 
   /*  Error case */
-  } else {
+  } // End transform
+  else {
     cerr << "Error: unknown command\n";
     print_usage();
     return EXIT_FAILURE;
@@ -89,101 +143,3 @@ int main(int argc, char **argv)
 
   return EXIT_SUCCESS;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* 
-TP1 Python Code
-    #### PIPELINE
-    # Reading data
-    reader = vtk.vtkXMLImageDataReader()
-    reader.SetFileName("data/head.vti")
-    reader.Update()
-
-    # Getting "head" scalar data
-    head = reader.GetOutput().GetPointData().GetScalars("head")
-
-    lookupTable = vtk.vtkLookupTable()
-    lookupTable.SetRange(head.GetRange())
-    lookupTable.Build()
-
-    # Creating isocontour of isovalue from read data
-    isovalue = float(50)
-    isoSurfaceContour = vtk.vtkContourFilter()
-    isoSurfaceContour.SetInputConnection(reader.GetOutputPort())
-    isoSurfaceContour.SetValue(0, isovalue)
-
-    # Creating mapper from isocontour
-    mapper = vtk.vtkPolyDataMapper()
-    mapper.SetInputConnection(isoSurfaceContour.GetOutputPort())
-    mapper.SetScalarRange(lookupTable.GetRange())
-
-    # Creating actor from isocontour
-    actor = vtk.vtkActor()
-    actor.SetMapper(mapper)
-    actor.GetProperty().SetColor(1,1,1)
-
-    # Using OpenGL renderer and linking with previous actors
-    renderer = vtk.vtkOpenGLRenderer()
-    renderer.AddActor(actor)
-    #renderer.AddActor(sliderWidget)
-    renderer.SetBackground(0, 0, 0)
-
-    # Initializing render window linked with previous renderer
-    window = vtk.vtkRenderWindow()
-    window.AddRenderer(renderer)
-    window.SetSize(800, 800)
-
-    interactor = vtk.vtkRenderWindowInteractor()
-    interactor.SetRenderWindow(window)
-    
-    # Creating colored scalar bar widget
-    scalarBarActor = vtk.vtkScalarBarActor()
-    scalarBarActor.SetLookupTable(lookupTable)
-    scalarBarWidget = vtk.vtkScalarBarWidget()
-    scalarBarWidget.SetInteractor(interactor)
-    scalarBarWidget.SetScalarBarActor(scalarBarActor)
-    scalarBarWidget.On()
-
-    # Creating slide bar
-    sliderRep = vtk.vtkSliderRepresentation2D()
-    sliderRep.SetTitleText("Contour value")
-    sliderRep.SetLabelHeight(0.05)
-    sliderRep.SetSliderWidth(0.1)
-    sliderRep.GetPoint1Coordinate().SetCoordinateSystemToNormalizedViewport()
-    sliderRep.GetPoint1Coordinate().SetValue(0.1, 0.1)
-    sliderRep.GetPoint2Coordinate().SetCoordinateSystemToNormalizedViewport()
-    sliderRep.GetPoint2Coordinate().SetValue(0.3, 0.1)
-    sliderRep.SetMinimumValue(head.GetRange()[0])
-    sliderRep.SetMaximumValue(head.GetRange()[-1])
-
-    def SliderCallback(obj, event):
-        sliderRep = obj.GetRepresentation()
-        pos = sliderRep.GetValue()
-        isoSurfaceContour.SetValue(0, pos)
-
-    sliderWidget = vtk.vtkSliderWidget()
-    sliderWidget.SetInteractor(interactor)
-    sliderWidget.SetRepresentation(sliderRep)
-    sliderWidget.On()
-    sliderWidget.AddObserver(vtk.vtkCommand.InteractionEvent, SliderCallback)
-
-    # Launching render window
-    interactor.Initialize()
-    window.Render()
-    interactor.Start()
- */
