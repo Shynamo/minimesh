@@ -8,6 +8,7 @@
 #include <vtkAppendPolyData.h>
 //#include <vtkCleanGrid.h>
 #include <vtkUnstructuredGridBaseAlgorithm.h>
+#include <vtkXMLUnstructuredGridWriter.h>
 
 using namespace std;
 
@@ -24,11 +25,13 @@ void Transform::setParams(struct Params *params){
 }
 
 bool Transform::saveOutput(){
-  if (this->_dataset == nullptr || this->_params){ return false; }
+  if (this->_dataset == nullptr || this->_params == nullptr) { return false; }
   //if (file_exists(this->_params->output)) { return false; }
-  cout << "TODO: Implement saveFile method.\n";
-  //TODO
-  return true;
+  vtkSmartPointer<vtkXMLUnstructuredGridWriter> writer
+    = vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
+  writer->SetFileName(this->_params->output.c_str());
+
+  return writer->Write() == 1 ? true : false;
 }
 
 bool Transform::getOutput(){
