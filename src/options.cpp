@@ -1,4 +1,5 @@
 #include "options.hpp"
+#include "transform.hpp"
 
 #include <memory>
 
@@ -16,6 +17,7 @@ Params *OptionsParser::parse(void)
   /* Merge case */
   if (name.compare("merge") == 0) {
     struct MergeParams *params = new MergeParams();
+    params->transform = TRANS_MERGE;
     params->merge_nodes = *transform->get_as<bool>("merge_nodes");
     
     auto io = m_data->get_table("io");
@@ -29,8 +31,8 @@ Params *OptionsParser::parse(void)
 
   /* Transform case */
   } else if (name.compare("translate") == 0) {
-    //FIXME: Seems like TranslationParams doesn't parse very well
     struct TranslationParams *params = new TranslationParams();
+    params->transform = TRANS_TRANSLATION;
     params->coords = *transform->get_array_of<double>("translation");
 
     auto io = m_data->get_table("io");

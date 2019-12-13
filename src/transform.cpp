@@ -47,7 +47,7 @@ void Transform::computeQuality(void){
 
 bool Transform::saveOutput(){
   if (this->_dataset == nullptr || this->_params == nullptr) { return false; }
-  //if (file_exists(this->_params->output)) { return false; }
+  if (file_exists(this->_params->output)) { return false; }
   vtkSmartPointer<vtkXMLUnstructuredGridWriter> writer
     = vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
   writer->SetFileName(this->_params->output.c_str());
