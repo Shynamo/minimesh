@@ -117,9 +117,9 @@ int main(int argc, char **argv)
       delete transformer;
       return EXIT_FAILURE;
     }
-    //if (!transformer->saveOutput()){
-    //  cerr << "WARNING: Couldn't save output file.\n";
-    //}
+    if (!transformer->saveOutput()){
+      cerr << "WARNING: Couldn't save output file.\n";
+    }
     Viewer *viewer = new Viewer();
     viewer->view(transformed_dataset);
     delete params;

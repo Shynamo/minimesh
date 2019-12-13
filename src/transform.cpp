@@ -46,14 +46,17 @@ void Transform::computeQuality(void){
 }
 
 bool Transform::saveOutput(){
+  // FIXME: segfault on this->_params->output
   if (this->_dataset == nullptr || this->_params == nullptr) { return false; }
-  if (file_exists(this->_params->output)) { return false; }
+  //if (file_exists(this->_params->output)) { return false; }
   vtkSmartPointer<vtkXMLUnstructuredGridWriter> writer
     = vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
-  writer->SetFileName(this->_params->output.c_str());
+  //cout << this->_params->output << end;
+  //writer->SetFileName(this->_params->output.c_str());
   writer->SetInputData(this->_dataset);
 
-  return writer->Write() == 1 ? true : false;
+  return false;
+  //return writer->Write() == 1 ? true : false;
 }
 
 bool Transform::getOutput(){
@@ -95,7 +98,6 @@ MergeTransform::start(){
 /* Translation Transform */
 vtkSmartPointer<vtkDataSet> 
 TranslationTransform::start(){
-  cerr << this->_params << endl;
   if (this->_params == nullptr){ return nullptr; }
   vtkSmartPointer<vtkXMLUnstructuredGridReader> reader
    = vtkSmartPointer<vtkXMLUnstructuredGridReader>::New();
